@@ -25,6 +25,24 @@ function useCopyToClipboard() {
   return { copied, copyToClipboard }
 }
 
+function useIsDarkMode() {
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+  const [isDark, setIsDark] = useState(prefersDark)
+  return isDark
+}
+
+function useStringToJSON(str: string) {
+  const [json, setJson] = useState(undefined)
+  useEffect(() => {
+    try {
+      setJson(JSON.parse(str))
+    } catch (e) {
+      setJson(undefined)
+    }
+  })
+  return json
+}
+
 function DataItem({
   label,
   content,
@@ -53,20 +71,8 @@ function DataItem({
 }
 function IndexPopup() {
   const [seoData, setSeoData] = useStorage("seoData", (val) => val ?? {})
-
-  const [jsonLD, setJsonLD] = useState(undefined)
-
-  useEffect(() => {
-    if (!seoData.jsonLdScript) {
-      setJsonLD(undefined)
-      return
-    }
-    try {
-      setJsonLD(JSON.parse(seoData.jsonLdScript))
-    } catch (e) {
-      // nothing
-    }
-  }, [seoData])
+  const isDark = useIsDarkMode()
+  const jsonLD = useStringToJSON(seoData.jsonLdScript)
 
   return (
     <main className="w-480px">
@@ -112,7 +118,7 @@ function IndexPopup() {
                 <JsonView
                   data={jsonLD}
                   shouldExpandNode={allExpanded}
-                  style={defaultStyles}
+                  style={isDark ? darkStyles : defaultStyles}
                 />
               )}
             </DataItem>
