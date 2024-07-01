@@ -101,14 +101,17 @@ function IndexPopup() {
             <DataItem label="og:title" content={seoData.ogTitle} />
             <DataItem label="og:description" content={seoData.ogDescription} />
             <DataItem label="og:image" content={seoData.ogImage}>
-              <img
-                src={seoData.ogImage}
-                alt="og:image"
-                className="w-100% mah-120px"
-                style={{
-                  objectFit: "contain"
-                }}
-              />
+              <p>
+                <a href={seoData.ogImage}>{seoData.ogImage}</a>
+                <img
+                  src={seoData.ogImage}
+                  alt="og:image"
+                  className="mt-6px w-100% mah-120px"
+                  style={{
+                    objectFit: "contain"
+                  }}
+                />
+              </p>
             </DataItem>
             <tr className="hr"></tr>
             <DataItem label="H1" content={seoData.h1?.[0]} />
