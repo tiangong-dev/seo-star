@@ -1,0 +1,59 @@
+:root {
+  color: #333;
+}
+* {
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  padding: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #fafafa;
+  }
+  html,
+  body {
+    background-color: #000;
+  }
+}
+
+table {
+  width: 100%;
+  display: grid;
+  border-collapse: collapse;
+  font-size: 12px;
+
+  grid-template-columns:
+    max-content
+    1fr;
+  column-gap: 8px;
+  row-gap: 6px;
+}
+
+thead,
+tbody,
+tr {
+  display: contents;
+}
+tr > th {
+  cursor: pointer;
+  text-align: left;
+}
+tr > th::before {
+  display: inline-block;
+  content: "📄";
+  margin-right: 4px;
+}
+tr.hr {
+  grid-column-start: span 2;
+  border-top: 1px solid #ccc;
+  display: block;
+}
+
+td {
+  overflow: hidden;
+}
