@@ -39,21 +39,9 @@ tbody,
 tr {
   display: contents;
 }
-tr > th {
-  cursor: pointer;
-  text-align: left;
-}
-tr > th::before {
-  display: inline-block;
-  content: "📄";
-  margin-right: 4px;
-}
+
 tr.hr {
   grid-column-start: span 2;
   border-top: 1px solid #ccc;
   display: block;
-}
-
-td {
-  overflow: hidden;
 }

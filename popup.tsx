@@ -12,6 +12,45 @@ import "./popup.css"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
+function useCopyToClipboard() {
+  const [copied, setCopied] = useState(false)
+  let timeout = null
+  function copyToClipboard(content: string) {
+    setCopied(true)
+    clearTimeout(timeout)
+    timeout = setTimeout(() => setCopied(false), 1000)
+    navigator.clipboard.writeText(content)
+  }
+
+  return { copied, copyToClipboard }
+}
+
+function DataItem({
+  label,
+  content,
+  children
+}: {
+  label: string
+  content?: string
+  children?: React.ReactElement
+}) {
+  const { copied, copyToClipboard } = useCopyToClipboard()
+
+  return (
+    <tr>
+      <th
+        className={`ta:l d:f colmg-4px ${content ? "cur:p" : "op-.6"}`}
+        onClick={() => {
+          if (content) copyToClipboard(content)
+        }}
+        title={`Copy ${label}`}>
+        <span>{copied ? "✅" : "📄"}</span>
+        {label}
+      </th>
+      <td className="ov:h">{content ? children ?? content : ""}</td>
+    </tr>
+  )
+}
 function IndexPopup() {
   const [seoData, setSeoData] = useStorage("seoData", (val) => val ?? {})
 
@@ -29,10 +68,6 @@ function IndexPopup() {
     }
   }, [seoData])
 
-  function copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text)
-  }
-
   return (
     <main className="w-480px">
       <header className="d:f jc:fe">
@@ -43,65 +78,44 @@ function IndexPopup() {
       <section className="mt-6px">
         <table>
           <tbody>
-            <tr>
-              <th>URL</th>
-              <td>
-                <a href={seoData.url}>{seoData.url}</a>
-              </td>
-            </tr>
-            <tr>
-              <th>Canonical URL</th>
-              <td>
-                <a href={seoData.canonical}>{seoData.canonical}</a>
-              </td>
-            </tr>
-            <tr>
-              <th>Title</th>
-              <td>{seoData.title}</td>
-            </tr>
-            <tr>
-              <th>Description</th>
-              <td>{seoData.description}</td>
-            </tr>
-            <tr>
-              <th>Keywords</th>
-              <td>{seoData.keywords}</td>
-            </tr>
+            <DataItem label="URL" content={seoData.url}>
+              <a href={seoData.url}>{seoData.url}</a>
+            </DataItem>
+
+            <DataItem label="Canonical URL" content={seoData.canonical}>
+              <a href={seoData.canonical}>{seoData.canonical}</a>
+            </DataItem>
+
+            <DataItem label="Title" content={seoData.title} />
+
+            <DataItem label="Description" content={seoData.description} />
+            <DataItem label="Keywords" content={seoData.keywords} />
             <tr className="hr"></tr>
-            <tr>
-              <th>og:type</th>
-              <td>{seoData.ogType}</td>
-            </tr>
-            <tr>
-              <th>og:title</th>
-              <td>{seoData.ogTitle}</td>
-            </tr>
-            <tr>
-              <th>og:description</th>
-              <td>{seoData.ogDescription}</td>
-            </tr>
-            <tr>
-              <th>og:image</th>
-              <td>{seoData.ogImage}</td>
-            </tr>
+            <DataItem label="og:type" content={seoData.ogType} />
+            <DataItem label="og:title" content={seoData.ogTitle} />
+            <DataItem label="og:description" content={seoData.ogDescription} />
+            <DataItem label="og:image" content={seoData.ogImage}>
+              <img
+                src={seoData.ogImage}
+                alt="og:image"
+                className="w-100% mah-120px"
+                style={{
+                  objectFit: "contain"
+                }}
+              />
+            </DataItem>
             <tr className="hr"></tr>
-            <tr>
-              <th>H1</th>
-              <td>{seoData.h1?.[0]}</td>
-            </tr>
+            <DataItem label="H1" content={seoData.h1?.[0]} />
             <tr className="hr"></tr>
-            <tr>
-              <th>JSON-LD</th>
-              <td>
-                {jsonLD && (
-                  <JsonView
-                    data={jsonLD}
-                    shouldExpandNode={allExpanded}
-                    style={defaultStyles}
-                  />
-                )}
-              </td>
-            </tr>
+            <DataItem label="JSON-LD" content={seoData.jsonLdScript}>
+              {jsonLD && (
+                <JsonView
+                  data={jsonLD}
+                  shouldExpandNode={allExpanded}
+                  style={defaultStyles}
+                />
+              )}
+            </DataItem>
           </tbody>
         </table>
       </section>
