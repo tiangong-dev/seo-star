@@ -1,7 +1,33 @@
 import { debounce } from "radash"
+import { onCLS, onINP, onLCP } from "web-vitals/attribution"
 
-import { getPort } from "@plasmohq/messaging/port"
 import { Storage } from "@plasmohq/storage"
+
+let LCP = undefined
+let CLS = undefined
+let INP = undefined
+
+onLCP((res) => {
+  LCP = {
+    rating: res.rating,
+    value: Math.floor(res.value)
+  }
+  getSEODataAndStore()
+})
+onCLS((res) => {
+  CLS = {
+    rating: res.rating,
+    value: Math.floor(res.value)
+  }
+  getSEODataAndStore()
+})
+onINP((res) => {
+  INP = {
+    rating: res.rating,
+    value: Math.floor(res.value)
+  }
+  getSEODataAndStore()
+})
 
 const getSEODataFromHTML = () => {
   const url = window.location.href
@@ -50,6 +76,10 @@ const getSEODataFromHTML = () => {
     h1.push(h1Element.innerText)
   })
   const seoData = {
+    LCP,
+    CLS,
+    INP,
+
     url,
     canonical,
     title,

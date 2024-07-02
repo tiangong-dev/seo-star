@@ -69,18 +69,82 @@ function DataItem({
     </tr>
   )
 }
+
+function PerformanceItem({
+  name,
+  value,
+  rating
+}: {
+  name: string
+  value?: number
+  rating?: "good" | "needs-improvement" | "poor"
+}) {
+  const [color, setColor] = useState("c-#aaa")
+  useEffect(() => {
+    switch (rating) {
+      case "good":
+        setColor("c-#0f0")
+        break
+      case "needs-improvement":
+        setColor("c-#ff0")
+        break
+      case "poor":
+        setColor("c-#f00")
+        break
+      default:
+        setColor("c-#aaa")
+    }
+  }, [rating])
+  return (
+    <p className={`${color} d:f colmg-4px`}>
+      {name}
+      <span>{value ?? "-"}</span>
+    </p>
+  )
+}
 function IndexPopup() {
   const [seoData, setSeoData] = useStorage("seoData", (val) => val ?? {})
   const isDark = useIsDarkMode()
   const jsonLD = useStringToJSON(seoData.jsonLdScript)
 
   return (
-    <main className="w-480px">
+    <main className="w-480px d:f fxd:c">
       <header className="d:f jc:fe">
-        <a href="https://github.com/tiangong-dev/seo-star" target="_blank">
+        <a
+          className="td:n"
+          href="https://github.com/tiangong-dev/seo-star"
+          target="_blank">
           <h1 className="c-#ff2121 fz-12px lh-16px">SEO Star</h1>
         </a>
       </header>
+      {seoData.CLS?.value || seoData.INP?.value || seoData.LCP?.value ? (
+        <section className="mt-6px">
+          <ul className="d:f colmg-6px">
+            <li>
+              <PerformanceItem
+                name="CLS"
+                value={seoData.CLS?.value}
+                rating={seoData.CLS?.rating}
+              />
+            </li>
+            <li>
+              <PerformanceItem
+                name="INP"
+                value={seoData.INP?.value}
+                rating={seoData.INP?.rating}
+              />
+            </li>
+            <li>
+              <PerformanceItem
+                name="LCP"
+                value={seoData.LCP?.value}
+                rating={seoData.LCP?.rating}
+              />
+            </li>
+          </ul>
+        </section>
+      ) : undefined}
+
       <section className="mt-6px">
         <table>
           <tbody>
