@@ -65,16 +65,20 @@ const getSEODataFromHTML = () => {
     document
       .querySelector("meta[property='og:url']")
       ?.getAttribute("content") || ""
+  const ogSiteName =
+    document
+      .querySelector("meta[property='og:site_name']")
+      ?.getAttribute("content") || ""
 
   // json-ld
-  const jsonLdScript = document.querySelector(
-    "script[type='application/ld+json']"
-  )?.textContent
+  const jsonLDs = Array.from(
+    document.querySelectorAll("script[type='application/ld+json']")
+  ).map((element) => element.textContent)
 
-  let h1 = []
-  document.querySelectorAll("h1").forEach((h1Element) => {
-    h1.push(h1Element.innerText)
-  })
+  let h1s = Array.from(document.querySelectorAll("h1")).map(
+    (element) => element.innerText
+  )
+
   const seoData = {
     LCP,
     CLS,
@@ -90,8 +94,8 @@ const getSEODataFromHTML = () => {
     ogDescription,
     ogImage,
     ogUrl,
-    h1,
-    jsonLdScript
+    h1s,
+    jsonLDs
   }
 
   return seoData

@@ -35,7 +35,7 @@ table {
     max-content
     1fr;
   column-gap: 8px;
-  row-gap: 6px;
+  row-gap: 8px;
 }
 
 thead,
@@ -48,4 +48,11 @@ tr.hr {
   grid-column-start: span 2;
   border-top: 1px solid #ccc;
   display: block;
+}
+tr.miss{
+  opacity: .6;
+  text-align: center;
+  grid-column-start: span 2;
+  display: block;
+  font-size: 12px;
 }
