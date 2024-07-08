@@ -12,6 +12,8 @@ import "./popup.css"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
+import type { SEOData } from "~types/seoData"
+
 function useCopyToClipboard() {
   const [copied, setCopied] = useState(false)
   let timeout = null
@@ -39,7 +41,7 @@ function useStringToJSON(str: string) {
     } catch (e) {
       setJson(undefined)
     }
-  })
+  }, [])
   return json
 }
 
@@ -56,16 +58,20 @@ function DataItem({
 
   return (
     <tr>
-      <th
-        className={`ta:l d:f colmg-4px ${content ? "cur:p" : "op-.6"}`}
-        onClick={() => {
-          if (content) copyToClipboard(content)
-        }}
-        title={`Copy ${label}`}>
-        <span>{copied ? "✅" : "📄"}</span>
-        {label}
-      </th>
-      <td className="ov:h">{children ?? content}</td>
+      <th className={`d:f ${content ? "" : "op-.6"}`}>{label}</th>
+      <td className="ov:h pos:r d:f ai:fs colmg-4px">
+        {content && (
+          <button
+            className="copy"
+            title={`Copy ${label}`}
+            onClick={() => {
+              copyToClipboard(content)
+            }}>
+            {copied ? "✅" : "📄"}
+          </button>
+        )}
+        <div>{children ?? content}</div>
+      </td>
     </tr>
   )
 }
@@ -123,8 +129,11 @@ function JsonLDContent({
     </>
   )
 }
+
 function IndexPopup() {
-  const [seoData, setSeoData] = useStorage("seoData", (val) => val ?? {})
+  const [seoData] = useStorage<SEOData>("seoData", (data) => {
+    return data ?? {}
+  })
   const isDark = useIsDarkMode()
   return (
     <main className="w-480px d:f fxd:c">
@@ -236,12 +245,8 @@ function IndexPopup() {
               }>
               <ul className="d:f fxd:c">
                 {seoData.jsonLDs?.map((content, index) => (
-                  <li className="mb-6px">
-                    <JsonLDContent
-                      key={index}
-                      content={content}
-                      isDark={isDark}
-                    />
+                  <li key={index} className="mb-6px">
+                    <JsonLDContent content={content} isDark={isDark} />
                   </li>
                 ))}
               </ul>

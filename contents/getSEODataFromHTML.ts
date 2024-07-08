@@ -3,6 +3,8 @@ import { onCLS, onINP, onLCP } from "web-vitals/attribution"
 
 import { Storage } from "@plasmohq/storage"
 
+import type { SEOData } from "~types/seoData"
+
 let LCP = undefined
 let CLS = undefined
 let INP = undefined
@@ -29,7 +31,7 @@ onINP((res) => {
   getSEODataAndStore()
 })
 
-const getSEODataFromHTML = () => {
+function getSEODataFromHTML() {
   const url = window.location.href
   const canonical =
     document.querySelector("link[rel='canonical']")?.getAttribute("href") || ""
@@ -79,7 +81,7 @@ const getSEODataFromHTML = () => {
     (element) => element.innerText
   )
 
-  const seoData = {
+  const seoData: SEOData = {
     LCP,
     CLS,
     INP,
@@ -94,6 +96,7 @@ const getSEODataFromHTML = () => {
     ogDescription,
     ogImage,
     ogUrl,
+    ogSiteName,
     h1s,
     jsonLDs
   }
@@ -102,10 +105,10 @@ const getSEODataFromHTML = () => {
 }
 
 const storage = new Storage()
-const getSEODataAndStore = debounce({ delay: 100 }, () => {
+const getSEODataAndStore = debounce({ delay: 200 }, async () => {
   const seoData = getSEODataFromHTML()
   if (document.visibilityState === "visible") {
-    storage.set("seoData", seoData)
+    await storage.set("seoData", seoData)
   }
   return seoData
 })
@@ -113,7 +116,7 @@ const getSEODataAndStore = debounce({ delay: 100 }, () => {
 getSEODataAndStore()
 
 const observer = new MutationObserver((mutations) => {
-  mutations.forEach((mutation) => getSEODataAndStore())
+  mutations.forEach(() => getSEODataAndStore())
 })
 observer.observe(document.head, {
   childList: true,
@@ -122,6 +125,9 @@ observer.observe(document.head, {
 })
 
 window.addEventListener("popstate", getSEODataAndStore)
+
+window.addEventListener("popstate", getSEODataAndStore)
+
 window.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
     getSEODataAndStore()
