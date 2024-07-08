@@ -1,10 +1,13 @@
-:root {
-  color: #212121;
-}
 * {
   padding: 0;
   margin: 0;
   list-style: none;
+  background: transparent;
+  border: none;
+}
+
+:root {
+  color: #212121;
 }
 
 body {
@@ -34,8 +37,8 @@ table {
   grid-template-columns:
     max-content
     1fr;
-  column-gap: 8px;
-  row-gap: 6px;
+  column-gap: 6px;
+  row-gap: 8px;
 }
 
 thead,
@@ -43,9 +46,28 @@ tbody,
 tr {
   display: contents;
 }
+td .copy {
+  visibility: hidden;
+  font-size: 10px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+td:hover .copy {
+  visibility: visible;
+  opacity: 1;
+}
 
 tr.hr {
   grid-column-start: span 2;
   border-top: 1px solid #ccc;
   display: block;
+}
+tr.miss {
+  opacity: 0.6;
+  text-align: center;
+  grid-column-start: span 2;
+  display: block;
+  font-size: 12px;
 }
