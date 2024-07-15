@@ -42,7 +42,7 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ secrets.SUBMIT_KEYS != '' }}
+    if: secrets.SUBMIT_KEYS != ''
     steps:
       - uses: actions/checkout@v4
       - name: Download artifact
