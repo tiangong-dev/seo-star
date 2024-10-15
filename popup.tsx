@@ -1,3 +1,25 @@
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip"
+import {
+  AlertCircle,
+  Check,
+  Copy,
+  ExternalLink,
+  Info,
+  Moon,
+  Search,
+  Sun,
+  X
+} from "lucide-react"
 import React, { useEffect, useState } from "react"
 import {
   allExpanded,
@@ -7,34 +29,31 @@ import {
 } from "react-json-view-lite"
 
 import "react-json-view-lite/dist/index.css"
-import "./uno.css"
+import "@/styles/globals.css"
 import "./popup.css"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
 import type { SEOData } from "~types/seoData"
 
-function useCopyToClipboard() {
-  const [copied, setCopied] = useState(false)
-  let timeout = null
-  function copyToClipboard(content: string) {
-    setCopied(true)
-    clearTimeout(timeout)
-    timeout = setTimeout(() => setCopied(false), 1000)
-    navigator.clipboard.writeText(content)
-  }
-
-  return { copied, copyToClipboard }
-}
-
-function useIsDarkMode() {
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-  const [isDark, setIsDark] = useState(prefersDark)
-  return isDark
+const titleMap = {
+  url: "URL",
+  canonical: "Canonical URL",
+  title: "Title",
+  description: "Description",
+  keywords: "Keywords",
+  ogType: "og:type",
+  ogTitle: "og:title",
+  ogDescription: "og:description",
+  ogImage: "og:image",
+  ogUrl: "og:url",
+  ogSiteName: "og:site_name",
+  h1s: "h1",
+  jsonLDs: "JSON-LD"
 }
 
 function useStringToJSON(str: string) {
-  const [json, setJson] = useState(undefined)
+  const [json, setJson] = useState<Object | undefined>(undefined)
   useEffect(() => {
     try {
       setJson(JSON.parse(str))
@@ -43,70 +62,6 @@ function useStringToJSON(str: string) {
     }
   }, [])
   return json
-}
-
-function DataItem({
-  label,
-  content,
-  children
-}: {
-  label: string
-  content?: string
-  children?: React.ReactElement
-}) {
-  const { copied, copyToClipboard } = useCopyToClipboard()
-
-  return (
-    <tr>
-      <th className={`d:f ${content ? "" : "op-.6"}`}>{label}</th>
-      <td className="ov:h pos:r d:f ai:fs colmg-4px">
-        {content && (
-          <button
-            className="copy"
-            title={`Copy ${label}`}
-            onClick={() => {
-              copyToClipboard(content)
-            }}>
-            {copied ? "✅" : "📄"}
-          </button>
-        )}
-        <div>{children ?? content}</div>
-      </td>
-    </tr>
-  )
-}
-
-function PerformanceItem({
-  name,
-  value,
-  rating
-}: {
-  name: string
-  value?: number
-  rating?: "good" | "needs-improvement" | "poor"
-}) {
-  const [color, setColor] = useState("c-#aaa")
-  useEffect(() => {
-    switch (rating) {
-      case "good":
-        setColor("c-#0f0")
-        break
-      case "needs-improvement":
-        setColor("c-#ff0")
-        break
-      case "poor":
-        setColor("c-#f00")
-        break
-      default:
-        setColor("c-#aaa")
-    }
-  }, [rating])
-  return (
-    <p className={`${color} d:f colmg-4px`}>
-      {name}
-      <span>{value ?? "-"}</span>
-    </p>
-  )
 }
 
 function JsonLDContent({
@@ -120,11 +75,16 @@ function JsonLDContent({
   return (
     <>
       {jsonLD && (
-        <JsonView
-          data={jsonLD}
-          shouldExpandNode={allExpanded}
-          style={isDark ? darkStyles : defaultStyles}
-        />
+        <div className="flex items-center space-x-2">
+          <div className="flex-1 overflow-hidden">
+            <JsonView
+              data={jsonLD}
+              shouldExpandNode={allExpanded}
+              style={isDark ? darkStyles : defaultStyles}
+            />
+          </div>
+          <CopyButton content={JSON.stringify(jsonLD, null, 2)} />
+        </div>
       )}
     </>
   )
@@ -134,127 +94,331 @@ function IndexPopup() {
   const [seoData] = useStorage<SEOData>("seoData", (data) => {
     return data ?? {}
   })
-  const isDark = useIsDarkMode()
+
+  const [darkMode, setDarkMode] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+  }, [darkMode])
+
+  const filterSeoData = (data: SEOData, term: string): SEOData => {
+    const filteredData: SEOData = {}
+
+    Object.entries(data)
+      .filter(([key, value]) => {
+        if (key.includes(term)) {
+          return true
+        }
+        if (
+          typeof value === "string" &&
+          value.toLowerCase().includes(term.toLowerCase())
+        ) {
+          return true
+        }
+        if (
+          typeof value === "object" &&
+          JSON.stringify(value).toLowerCase().includes(term.toLowerCase())
+        ) {
+          return true
+        }
+
+        return false
+      })
+      .forEach(([key, value]) => {
+        filteredData[key] = value
+      })
+
+    if (data.CLS) filteredData.CLS = data.CLS
+    if (data.INP) filteredData.INP = data.INP
+    if (data.LCP) filteredData.LCP = data.LCP
+
+    return filteredData
+  }
+  const [searchTerm, setSearchTerm] = useState("")
+  const filteredSeoData = searchTerm
+    ? filterSeoData(seoData, searchTerm)
+    : seoData
+  const clearSearch = () => {
+    setSearchTerm("")
+  }
+
   return (
-    <main className="w-480px d:f fxd:c">
-      <header className="d:f jc:fe">
-        <a
-          className="td:n"
-          href="https://github.com/tiangong-dev/seo-star"
-          target="_blank">
-          <h1 className="c-#ff2121 fz-12px lh-16px">SEO Star</h1>
-        </a>
-      </header>
-      {seoData.CLS?.value || seoData.INP?.value || seoData.LCP?.value ? (
-        <section className="mt-6px">
-          <ul className="d:f colmg-6px">
-            <li>
-              <PerformanceItem
-                name="CLS"
-                value={seoData.CLS?.value}
-                rating={seoData.CLS?.rating}
+    <div className="w-[720px] bg-gray-100 dark:bg-gray-900 p-4 transition-colors duration-200">
+      <Card className="max-w-4xl mx-auto dark:bg-gray-800">
+        <CardHeader className="flex flex-col space-y-4 pb-2">
+          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-2xl font-bold dark:text-white">
+              SEO Star
+            </CardTitle>
+            <div className="flex items-center space-x-4">
+              <div className="flex space-x-2">
+                {seoData.CLS && (
+                  <WebVitalsBadge
+                    value={seoData.CLS.value}
+                    rating={seoData.CLS.rating}
+                  />
+                )}
+                {seoData.INP && (
+                  <WebVitalsBadge
+                    value={seoData.INP.value}
+                    rating={seoData.INP.rating}
+                  />
+                )}
+                {seoData.LCP && (
+                  <WebVitalsBadge
+                    value={seoData.LCP.value}
+                    rating={seoData.LCP.rating}
+                  />
+                )}
+              </div>
+              <div className="flex items-center space-x-2">
+                <Sun className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <Switch
+                  checked={darkMode}
+                  onCheckedChange={setDarkMode}
+                  aria-label="Toggle dark mode"
+                />
+                <Moon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowSearch(!showSearch)}
+                className="dark:bg-gray-700 dark:text-white">
+                {showSearch ? (
+                  <X className="h-4 w-4" />
+                ) : (
+                  <Search className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+          {showSearch && (
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search SEO data..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8 pr-8 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
               />
-            </li>
-            <li>
-              <PerformanceItem
-                name="INP"
-                value={seoData.INP?.value}
-                rating={seoData.INP?.rating}
-              />
-            </li>
-            <li>
-              <PerformanceItem
-                name="LCP"
-                value={seoData.LCP?.value}
-                rating={seoData.LCP?.rating}
-              />
-            </li>
+              {searchTerm && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          )}
+        </CardHeader>
+        <CardContent className="mt-4">
+          <ul className="space-y-4">
+            {Object.keys(filteredSeoData).map((key) => {
+              const content = filteredSeoData[key]
+              const title = titleMap[key] || key
+              if (!content || content.length === 0) {
+                return (
+                  <ListItem
+                    key={key}
+                    title={title}
+                    content={<EmptyStatus message={`Empty`} />}
+                  />
+                )
+              }
+
+              if (key === "keywords") {
+                return (
+                  <ListItem
+                    key={key}
+                    title={title}
+                    content={
+                      <div className="flex flex-wrap gap-2">
+                        {content.split(",").map((keyword) => (
+                          <Badge
+                            key={keyword}
+                            variant="secondary"
+                            className="dark:bg-gray-700 dark:text-gray-200 flex items-center space-x-1 pr-1">
+                            <span>{keyword}</span>
+                            <CopyButton content={keyword} />
+                          </Badge>
+                        ))}
+                      </div>
+                    }
+                  />
+                )
+              }
+
+              if (key === "ogImage") {
+                return (
+                  <ListItem
+                    key={key}
+                    title={title}
+                    content={
+                      <img
+                        src={content}
+                        alt="OG Image"
+                        className="w-full max-w-xs h-auto rounded-lg shadow-md"
+                      />
+                    }
+                  />
+                )
+              }
+
+              if (key === "jsonLDs") {
+                return (
+                  <ListItem
+                    key={key}
+                    title={title}
+                    content={
+                      <>
+                        {content.map((jsonLd) => (
+                          <pre className="bg-gray-100 dark:bg-gray-700 p-2 rounded text-xs overflow-x-auto whitespace-pre-wrap dark:text-gray-200">
+                            <JsonLDContent content={jsonLd} isDark={darkMode} />
+                          </pre>
+                        ))}
+                      </>
+                    }
+                  />
+                )
+              }
+
+              return <ListItem key={key} title={title} content={content} />
+            })}
           </ul>
-        </section>
-      ) : undefined}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 
-      <section className="mt-6px">
-        <table>
-          <tbody>
-            <DataItem label="URL" content={seoData.url}>
-              <a href={seoData.url}>{seoData.url}</a>
-            </DataItem>
+function ListItem({
+  title,
+  content,
+  info
+}: {
+  title: string
+  content: string | React.ReactNode
+  info?: string
+}) {
+  const contentItems = Array.isArray(content) ? content : [content]
+  return (
+    <li className="flex flex-col sm:flex-row sm:items-center border-b border-gray-200 dark:border-gray-700 pb-2">
+      <div className="w-full sm:w-1/3 flex items-center">
+        <h3 className="text-sm font-medium mr-1 dark:text-white">{title}</h3>
+        {info && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{info}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
+      <div className="w-full sm:w-2/3 mt-1 sm:mt-0">
+        {contentItems.map((content) =>
+          typeof content === "string" ? (
+            <div className="flex items-center space-x-2" key={content}>
+              <p className="text-sm text-gray-600 dark:text-gray-300 break-all">
+                {content}
+              </p>
+              {content && <CopyButton content={content} />}
+              {content.startsWith("http") && (
+                <a
+                  href={content}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          ) : (
+            content
+          )
+        )}
+      </div>
+    </li>
+  )
+}
 
-            <DataItem label="Canonical URL" content={seoData.canonical}>
-              <a href={seoData.canonical}>{seoData.canonical}</a>
-            </DataItem>
+function MetricBadge({
+  label,
+  value,
+  className
+}: {
+  label: string
+  value: string | number
+  className?: string
+}) {
+  return (
+    <Badge variant="outline" className={className}>
+      {label} {value}
+    </Badge>
+  )
+}
 
-            <DataItem label="Title" content={seoData.title} />
+function CopyButton({ content }: { content: string }) {
+  const [copied, setCopied] = useState(false)
 
-            <DataItem label="Description" content={seoData.description} />
-            <DataItem label="Keywords" content={seoData.keywords} />
-            <tr className="hr"></tr>
-            {!seoData.ogType &&
-            !seoData.ogTitle &&
-            !seoData.ogImage &&
-            !seoData.ogDescription &&
-            !seoData.ogSiteName ? (
-              <tr className="miss"> Miss OG Metadata</tr>
-            ) : (
-              <>
-                {/* Basic Metadata */}
-                <DataItem label="og:type" content={seoData.ogType} />
-                <DataItem label="og:title" content={seoData.ogTitle} />
-                <DataItem label="og:image" content={seoData.ogImage}>
-                  <p>
-                    <a href={seoData.ogImage}>{seoData.ogImage}</a>
-                    <img
-                      src={seoData.ogImage}
-                      alt="og:image"
-                      className="mt-6px w-100% mah-120px"
-                      style={{
-                        objectFit: "contain"
-                      }}
-                    />
-                  </p>
-                </DataItem>
-                {/* Optional Metadata */}
-                <DataItem
-                  label="og:description"
-                  content={seoData.ogDescription}
-                />
-                <DataItem
-                  label="og:site_name"
-                  content={seoData.ogDescription}
-                />
-              </>
-            )}
+  const copyContent = () => {
+    navigator.clipboard.writeText(content)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
-            <tr className="hr"></tr>
-            <DataItem label="H1" content={seoData.h1s?.[0]}>
-              <ul>
-                {seoData.h1s?.map((content, index) => (
-                  <li key={index} className={`${index > 0 ? "c-f00" : ""}`}>
-                    {content}
-                  </li>
-                ))}
-              </ul>
-            </DataItem>
-            <tr className="hr"></tr>
-            <DataItem
-              label="JSON-LD"
-              content={
-                seoData.jsonLDs?.length > 0
-                  ? seoData.jsonLDs.join("\n")
-                  : undefined
-              }>
-              <ul className="d:f fxd:c">
-                {seoData.jsonLDs?.map((content, index) => (
-                  <li key={index} className="mb-6px">
-                    <JsonLDContent content={content} isDark={isDark} />
-                  </li>
-                ))}
-              </ul>
-            </DataItem>
-          </tbody>
-        </table>
-      </section>
-    </main>
+  return (
+    <button
+      onClick={copyContent}
+      className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors">
+      {copied ? (
+        <Check className="h-4 w-4 text-green-500" />
+      ) : (
+        <Copy className="h-4 w-4" />
+      )}
+    </button>
+  )
+}
+
+function WebVitalsBadge({
+  value,
+  rating
+}: {
+  value: string | number
+  rating: string
+}) {
+  const getColor = (rating: string) => {
+    switch (rating) {
+      case "good":
+        return "text-green-600 border-green-600 dark:text-green-400 dark:border-green-400"
+      case "needs-improvement":
+        return "text-yellow-600 border-yellow-600 dark:text-yellow-400 dark:border-yellow-400"
+      default:
+        return "text-red-600 border-red-600 dark:text-red-400 dark:border-red-400"
+    }
+  }
+
+  return (
+    <MetricBadge label={value} value={rating} className={getColor(rating)} />
+  )
+}
+
+function EmptyStatus({ message }) {
+  return (
+    <div className="flex items-center space-x-2 text-gray-400 dark:text-gray-400">
+      <AlertCircle className="h-4 w-4" />
+      <span className="text-sm">{message}</span>
+    </div>
   )
 }
 
