@@ -42,13 +42,13 @@ const titleMap = {
   title: "Title",
   description: "Description",
   keywords: "Keywords",
+  h1s: "H1",
   ogType: "og:type",
   ogTitle: "og:title",
   ogDescription: "og:description",
   ogImage: "og:image",
   ogUrl: "og:url",
   ogSiteName: "og:site_name",
-  h1s: "h1",
   jsonLDs: "JSON-LD"
 }
 
@@ -240,9 +240,9 @@ function IndexPopup() {
                     title={title}
                     content={
                       <div className="flex flex-wrap gap-2">
-                        {content.split(",").map((keyword) => (
+                        {content.split(",").map((keyword, idx) => (
                           <Badge
-                            key={keyword}
+                            key={keyword + idx}
                             variant="secondary"
                             className="dark:bg-gray-700 dark:text-gray-200 flex items-center space-x-1 pr-1">
                             <span>{keyword}</span>
@@ -278,8 +278,10 @@ function IndexPopup() {
                     title={title}
                     content={
                       <>
-                        {content.map((jsonLd) => (
-                          <pre className="bg-gray-100 dark:bg-gray-700 p-2 rounded text-xs overflow-x-auto whitespace-pre-wrap dark:text-gray-200">
+                        {content.map((jsonLd, index) => (
+                          <pre
+                            key={index}
+                            className="bg-gray-100 dark:bg-gray-700 p-2 rounded text-xs overflow-x-auto whitespace-pre-wrap dark:text-gray-200">
                             <JsonLDContent content={jsonLd} isDark={darkMode} />
                           </pre>
                         ))}
@@ -326,27 +328,33 @@ function ListItem({
         )}
       </div>
       <div className="w-full sm:w-2/3 mt-1 sm:mt-0">
-        {contentItems.map((content) =>
-          typeof content === "string" ? (
-            <div className="flex items-center space-x-2" key={content}>
-              <p className="text-sm text-gray-600 dark:text-gray-300 break-all">
-                {content}
-              </p>
-              {content && <CopyButton content={content} />}
-              {content.startsWith("http") && (
-                <a
-                  href={content}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              )}
-            </div>
-          ) : (
-            content
-          )
-        )}
+        {contentItems.map((content, idx) => {
+          if (typeof content === "string") {
+            return (
+              <div className="flex items-center space-x-2" key={idx}>
+                <p className="text-sm text-gray-600 dark:text-gray-300 break-all">
+                  {content}
+                </p>
+                {content && <CopyButton content={content} />}
+                {content.startsWith("http") && (
+                  <a
+                    href={content}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                )}
+              </div>
+            )
+          }
+
+          if (React.isValidElement(content)) {
+            return <div key={idx}>{content}</div>
+          }
+
+          return <div key={idx}>{JSON.stringify(content, null, 2)}</div>
+        })}
       </div>
     </li>
   )
@@ -409,7 +417,11 @@ function WebVitalsBadge({
   }
 
   return (
-    <MetricBadge label={value} value={rating} className={getColor(rating)} />
+    <MetricBadge
+      label={value + ""}
+      value={rating}
+      className={getColor(rating)}
+    />
   )
 }
 

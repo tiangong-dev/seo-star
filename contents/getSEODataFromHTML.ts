@@ -91,13 +91,14 @@ function getSEODataFromHTML() {
     title,
     description,
     keywords,
+    h1s,
     ogType,
     ogTitle,
     ogDescription,
     ogImage,
     ogUrl,
     ogSiteName,
-    h1s,
+
     jsonLDs
   }
 
