@@ -1,5 +1,7 @@
 # SEO Star
 
+[![License](https://img.shields.io/github/license/tiangong-dev/seo-star.svg)](https://github.com/tiangong-dev/seo-star/blob/master/LICENSE)
+
 <p align="center">
   <img src="./assets/icon.png" alt="SEO Star Logo">
 </p>
