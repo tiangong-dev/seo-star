@@ -162,18 +162,21 @@ function IndexPopup() {
               <div className="flex space-x-2">
                 {seoData.CLS && (
                   <WebVitalsBadge
+                    label="CLS"
                     value={seoData.CLS.value}
                     rating={seoData.CLS.rating}
                   />
                 )}
                 {seoData.INP && (
                   <WebVitalsBadge
+                    label="INP"
                     value={seoData.INP.value}
                     rating={seoData.INP.rating}
                   />
                 )}
                 {seoData.LCP && (
                   <WebVitalsBadge
+                    label="LCP"
                     value={seoData.LCP.value}
                     rating={seoData.LCP.rating}
                   />
@@ -264,11 +267,19 @@ function IndexPopup() {
                     key={key}
                     title={title}
                     content={
-                      <img
-                        src={content}
-                        alt="OG Image"
-                        className="w-full max-h-[120px] w-auto rounded-lg shadow-md"
-                      />
+                      <div className="flex flex-col items-center gap-2">
+                        <img
+                          src={content}
+                          alt="OG Image"
+                          className="max-w-full max-h-[120px] w-auto rounded-lg shadow-md object-contain"
+                        />
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 break-all">
+                            {content}
+                          </p>
+                          <CopyButton content={content} />
+                        </div>
+                      </div>
                     }
                   />
                 )
@@ -366,14 +377,28 @@ function ListItem({
 function MetricBadge({
   label,
   value,
+  info,
   className
 }: {
   label: string
   value: string | number
+  info?: string
   className?: string
 }) {
   return (
-    <Badge variant="outline" className={className}>
+    <Badge
+      variant="outline"
+      className={className + " flex items-center gap-2  cursor-pointer"}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Info className="h-4 w-4" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{info}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {label} {value}
     </Badge>
   )
@@ -391,7 +416,8 @@ function CopyButton({ content }: { content: string }) {
   return (
     <button
       onClick={copyContent}
-      className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors">
+      className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+      title={copied ? "Copied" : "Copy"}>
       {copied ? (
         <Check className="h-4 w-4 text-green-500" />
       ) : (
@@ -402,9 +428,11 @@ function CopyButton({ content }: { content: string }) {
 }
 
 function WebVitalsBadge({
+  label,
   value,
   rating
 }: {
+  label: string
   value: string | number
   rating: string
 }) {
@@ -421,8 +449,9 @@ function WebVitalsBadge({
 
   return (
     <MetricBadge
-      label={value + ""}
-      value={rating}
+      label={label}
+      value={value}
+      info={rating}
       className={getColor(rating)}
     />
   )

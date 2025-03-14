@@ -1,5 +1,5 @@
 import { debounce } from "radash"
-import { onCLS, onINP, onLCP } from "web-vitals/attribution"
+import { onCLS, onINP, onLCP } from "web-vitals"
 
 import { Storage } from "@plasmohq/storage"
 
@@ -12,21 +12,23 @@ let INP = undefined
 onLCP((res) => {
   LCP = {
     rating: res.rating,
-    value: Math.floor(res.value)
+    value: Math.floor(res.value * 100) / 100
   }
   getSEODataAndStore()
 })
+
 onCLS((res) => {
   CLS = {
     rating: res.rating,
-    value: Math.floor(res.value)
+    value: Math.floor(res.value * 100) / 100
   }
   getSEODataAndStore()
 })
+
 onINP((res) => {
   INP = {
     rating: res.rating,
-    value: Math.floor(res.value)
+    value: Math.floor(res.value * 100) / 100
   }
   getSEODataAndStore()
 })
