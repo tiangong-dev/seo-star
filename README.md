@@ -8,6 +8,10 @@
 
 User-Friendly SEO Companion. This browser extension is your key to unlocking the world of search engine optimization.
 
+## Installation
+
+Chrome: [https://chromewebstore.google.com/detail/Seo%20Star/icgchbcpbdloihdbjggenepbnleafjbb](https://chromewebstore.google.com/detail/Seo%20Star/icgchbcpbdloihdbjggenepbnleafjbb)
+
 ## Development
 
 ### Getting Started
