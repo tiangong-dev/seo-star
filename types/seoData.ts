@@ -1,15 +1,23 @@
 import type { Metric } from "web-vitals"
 
+export interface SEOWebVitals {
+  rating: "good" | "needs-improvement" | "poor"
+  value: number
+}
+
 export type SEOData = {
-  LCP?: Partial<Metric>
-  CLS?: Partial<Metric>
-  INP?: Partial<Metric>
+  LCP?: SEOWebVitals | Partial<Metric>
+  CLS?: SEOWebVitals | Partial<Metric>
+  INP?: SEOWebVitals | Partial<Metric>
 
   url?: string
   canonical?: string
   title?: string
   description?: string
   keywords?: string
+
+  h1s?: string[]
+
   ogType?: string
   ogTitle?: string
   ogDescription?: string
@@ -17,6 +25,5 @@ export type SEOData = {
   ogUrl?: string
   ogSiteName?: string
 
-  h1s?: string[]
   jsonLDs?: string[]
 }
