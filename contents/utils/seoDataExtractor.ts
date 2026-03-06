@@ -59,26 +59,19 @@ export const extractHeadingData = (): Pick<SEOData, "h1s"> => ({
   )
 })
 
+const getTwitterMeta = (tag: string): string =>
+  document
+    .querySelector(`meta[name='twitter:${tag}'], meta[property='twitter:${tag}']`)
+    ?.getAttribute("content") || ""
+
 export const extractTwitterData = (): Pick<
   SEOData,
   "twitterCard" | "twitterTitle" | "twitterDescription" | "twitterImage"
 > => ({
-  twitterCard:
-    document
-      .querySelector("meta[name='twitter:card']")
-      ?.getAttribute("content") || "",
-  twitterTitle:
-    document
-      .querySelector("meta[name='twitter:title']")
-      ?.getAttribute("content") || "",
-  twitterDescription:
-    document
-      .querySelector("meta[name='twitter:description']")
-      ?.getAttribute("content") || "",
-  twitterImage:
-    document
-      .querySelector("meta[name='twitter:image']")
-      ?.getAttribute("content") || ""
+  twitterCard: getTwitterMeta("card"),
+  twitterTitle: getTwitterMeta("title"),
+  twitterDescription: getTwitterMeta("description"),
+  twitterImage: getTwitterMeta("image")
 })
 
 export const extractRobotsData = (): Pick<SEOData, "robots" | "googlebot"> => ({
