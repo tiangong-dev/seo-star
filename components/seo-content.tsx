@@ -15,7 +15,7 @@ interface SEOContentProps {
 
 export function SEOContent({ filteredSeoData, darkMode }: SEOContentProps) {
   return (
-    <ul className="space-y-4">
+    <ul className="space-y-2">
       {Object.keys(filteredSeoData).map((key) => {
         const content = filteredSeoData[key]
         const title = titleMap[key] || key
@@ -36,7 +36,7 @@ export function SEOContent({ filteredSeoData, darkMode }: SEOContentProps) {
               key={key}
               title={title}
               content={
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1">
                   {content.split(",").map((keyword, idx) => (
                     <Badge
                       key={keyword + idx}
@@ -58,18 +58,64 @@ export function SEOContent({ filteredSeoData, darkMode }: SEOContentProps) {
               key={key}
               title={title}
               content={
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-1">
                   <img
                     src={content}
                     alt="OG Image"
-                    className="max-w-full max-h-[120px] w-auto rounded-lg shadow-md object-contain"
+                    className="max-w-full max-h-[100px] w-auto rounded-lg shadow-md object-contain"
                   />
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <p className="text-xs text-gray-500 dark:text-gray-400 break-all">
                       {content}
                     </p>
                     <CopyButton content={content} />
                   </div>
+                </div>
+              }
+            />
+          )
+        }
+
+        if (key === "twitterImage") {
+          return (
+            <ListItem
+              key={key}
+              title={title}
+              content={
+                <div className="flex flex-col items-center gap-1">
+                  <img
+                    src={content}
+                    alt="Twitter Image"
+                    className="max-w-full max-h-[100px] w-auto rounded-lg shadow-md object-contain"
+                  />
+                  <div className="flex items-center gap-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 break-all">
+                      {content}
+                    </p>
+                    <CopyButton content={content} />
+                  </div>
+                </div>
+              }
+            />
+          )
+        }
+
+        if (key === "hreflangs") {
+          return (
+            <ListItem
+              key={key}
+              title={title}
+              content={
+                <div className="flex flex-wrap gap-1">
+                  {content.map((item, idx) => (
+                    <Badge
+                      key={item + idx}
+                      variant="secondary"
+                      className="dark:bg-gray-700 dark:text-gray-200 flex items-center space-x-1 pr-1">
+                      <span>{item}</span>
+                      <CopyButton content={item} />
+                    </Badge>
+                  ))}
                 </div>
               }
             />

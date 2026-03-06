@@ -11,5 +11,12 @@ export const titleMap = {
   ogImage: "og:image",
   ogUrl: "og:url",
   ogSiteName: "og:site_name",
+  twitterCard: "twitter:card",
+  twitterTitle: "twitter:title",
+  twitterDescription: "twitter:description",
+  twitterImage: "twitter:image",
+  robots: "Robots",
+  googlebot: "Googlebot",
+  hreflangs: "Hreflang",
   jsonLDs: "JSON-LD"
 }

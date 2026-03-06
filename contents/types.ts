@@ -28,6 +28,19 @@ export interface SEOData {
   ogUrl: string
   ogSiteName: string
 
+  // Twitter Card
+  twitterCard: string
+  twitterTitle: string
+  twitterDescription: string
+  twitterImage: string
+
+  // Robots
+  robots: string
+  googlebot: string
+
+  // Hreflang
+  hreflangs: string[]
+
   // JSON-LD
   jsonLDs: string[]
 }

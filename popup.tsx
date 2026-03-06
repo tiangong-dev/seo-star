@@ -25,9 +25,9 @@ function IndexPopup() {
     useSearch(seoData)
 
   return (
-    <div className="w-[720px] bg-gray-100 dark:bg-gray-900 p-4 transition-colors duration-200">
+    <div className="w-[720px] bg-gray-100 dark:bg-gray-900 p-2 transition-colors duration-200">
       <Card className="max-w-4xl mx-auto dark:bg-gray-800">
-        <CardHeader className="flex flex-col space-y-4 pb-2">
+        <CardHeader className="flex flex-col space-y-2 pb-1">
           <Header
             seoData={seoData}
             darkMode={darkMode}
@@ -41,7 +41,7 @@ function IndexPopup() {
           clearSearch={clearSearch}
         />
 
-        <CardContent className="mt-4">
+        <CardContent className="mt-2">
           <SEOContent filteredSeoData={filteredSeoData} darkMode={darkMode} />
         </CardContent>
       </Card>

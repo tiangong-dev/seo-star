@@ -14,7 +14,7 @@ export function SearchBar({
   clearSearch
 }: SearchBarProps) {
   return (
-    <div className="sticky top-0 z-10 px-6 py-2 border-b border-border">
+    <div className="sticky top-0 z-10 px-6 py-1 border-b border-border">
       <div className="relative">
         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input

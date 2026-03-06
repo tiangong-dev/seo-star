@@ -59,6 +59,47 @@ export const extractHeadingData = (): Pick<SEOData, "h1s"> => ({
   )
 })
 
+export const extractTwitterData = (): Pick<
+  SEOData,
+  "twitterCard" | "twitterTitle" | "twitterDescription" | "twitterImage"
+> => ({
+  twitterCard:
+    document
+      .querySelector("meta[name='twitter:card']")
+      ?.getAttribute("content") || "",
+  twitterTitle:
+    document
+      .querySelector("meta[name='twitter:title']")
+      ?.getAttribute("content") || "",
+  twitterDescription:
+    document
+      .querySelector("meta[name='twitter:description']")
+      ?.getAttribute("content") || "",
+  twitterImage:
+    document
+      .querySelector("meta[name='twitter:image']")
+      ?.getAttribute("content") || ""
+})
+
+export const extractRobotsData = (): Pick<SEOData, "robots" | "googlebot"> => ({
+  robots:
+    document
+      .querySelector("meta[name='robots']")
+      ?.getAttribute("content") || "",
+  googlebot:
+    document
+      .querySelector("meta[name='googlebot']")
+      ?.getAttribute("content") || ""
+})
+
+export const extractHreflangData = (): Pick<SEOData, "hreflangs"> => ({
+  hreflangs: Array.from(
+    document.querySelectorAll("link[rel='alternate'][hreflang]")
+  ).map(
+    (el) => `${el.getAttribute("hreflang")}: ${el.getAttribute("href") || ""}`
+  )
+})
+
 export const getSEOData = (webVitals: {
   LCP?: SEOWebVitals
   CLS?: SEOWebVitals
@@ -67,8 +108,11 @@ export const getSEOData = (webVitals: {
   return {
     ...extractBasicSEOData(),
     ...extractOGData(),
+    ...extractTwitterData(),
+    ...extractRobotsData(),
     ...extractJSONLDData(),
     ...extractHeadingData(),
+    ...extractHreflangData(),
     ...webVitals
   }
 }

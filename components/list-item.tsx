@@ -19,9 +19,9 @@ export function ListItem({ title, content, info }: ListItemProps) {
   const contentItems = Array.isArray(content) ? content : [content]
 
   return (
-    <li className="flex flex-col sm:flex-row sm:items-center border-b border-gray-200 dark:border-gray-700 pb-2">
+    <li className="flex flex-col sm:flex-row sm:items-center border-b border-gray-200 dark:border-gray-700 pb-1">
       <div className="w-full sm:w-1/3 flex items-center">
-        <h3 className="text-sm font-medium mr-1 dark:text-white">{title}</h3>
+        <h3 className="text-xs font-medium mr-1 dark:text-white">{title}</h3>
         {info && (
           <TooltipProvider>
             <Tooltip>
@@ -40,7 +40,7 @@ export function ListItem({ title, content, info }: ListItemProps) {
           if (typeof content === "string") {
             return (
               <div className="flex items-center space-x-2" key={idx}>
-                <p className="text-sm text-gray-600 dark:text-gray-300 break-all">
+                <p className="text-xs text-gray-600 dark:text-gray-300 break-all">
                   {content}
                 </p>
                 {content && <CopyButton content={content} />}

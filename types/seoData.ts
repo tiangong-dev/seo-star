@@ -25,5 +25,15 @@ export type SEOData = {
   ogUrl?: string
   ogSiteName?: string
 
+  twitterCard?: string
+  twitterTitle?: string
+  twitterDescription?: string
+  twitterImage?: string
+
+  robots?: string
+  googlebot?: string
+
+  hreflangs?: string[]
+
   jsonLDs?: string[]
 }

@@ -20,7 +20,7 @@ export function Header({
 }: HeaderProps) {
   return (
     <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-2xl font-bold dark:text-white">
+      <CardTitle className="text-xl font-bold dark:text-white">
         SEO Star
       </CardTitle>
       <div className="flex items-center space-x-4">
