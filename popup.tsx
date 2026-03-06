@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import React from "react"
+import React, { useEffect, useState } from "react"
 
+import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import "react-json-view-lite/dist/index.css"
@@ -15,21 +16,46 @@ import type { SEOData } from "~types/seoData"
 import { useSearch } from "./hooks/useSearch"
 import { useThemeMode } from "./hooks/useThemeMode"
 
+const storage = new Storage()
+
 function IndexPopup() {
   const [seoData] = useStorage<SEOData>("seoData", (data) => {
     return data ?? {}
   })
+  const [tabUrl, setTabUrl] = useState<string>("")
+
+  useEffect(() => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs[0]
+      if (!tab?.id || !tab.url) return
+
+      setTabUrl(tab.url)
+
+      chrome.tabs.sendMessage(
+        tab.id,
+        { type: "SEO_STAR_REFRESH" },
+        () => {
+          if (chrome.runtime.lastError) {
+            storage.set("seoData", {})
+          }
+        }
+      )
+    })
+  }, [])
+
+  const validSeoData =
+    tabUrl && seoData?.url && seoData.url !== tabUrl ? {} : seoData
 
   const { darkMode, setDarkMode } = useThemeMode()
   const { searchTerm, setSearchTerm, filteredSeoData, clearSearch } =
-    useSearch(seoData)
+    useSearch(validSeoData)
 
   return (
     <div className="w-[720px] bg-gray-100 dark:bg-gray-900 p-2 transition-colors duration-200">
       <Card className="max-w-4xl mx-auto dark:bg-gray-800">
         <CardHeader className="flex flex-col space-y-2 pb-1">
           <Header
-            seoData={seoData}
+            seoData={validSeoData}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
           />

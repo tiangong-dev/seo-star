@@ -12,6 +12,10 @@ export const storeSEOData = async (seoData: SEOData): Promise<void> => {
   }
 }
 
+export const forceStoreSEOData = async (seoData: SEOData): Promise<void> => {
+  await storage.set("seoData", seoData)
+}
+
 export const createDebouncedStorageFunction = (
   getSEODataFn: () => SEOData,
   delay = 200
@@ -25,4 +29,8 @@ export const createDebouncedStorageFunction = (
 
 export const getSEODataFromStorage = async (): Promise<SEOData | undefined> => {
   return await storage.get<SEOData>("seoData")
+}
+
+export const clearSEOData = async (): Promise<void> => {
+  await storage.set("seoData", {})
 }
