@@ -7,10 +7,7 @@ import {
   observeExistingHeadings
 } from "./utils/observers"
 import { getSEOData } from "./utils/seoDataExtractor"
-import {
-  createDebouncedStorageFunction,
-  forceStoreSEOData
-} from "./utils/storage"
+import { createDebouncedStorageFunction } from "./utils/storage"
 import { createWebVitalsObserver } from "./utils/webVitals"
 
 let vitalsState = {
@@ -47,11 +44,9 @@ const initSEOApp = () => {
 
   debouncedStoreSEOData()
 
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message) => {
     if (message.type === "SEO_STAR_REFRESH") {
-      const seoData = getSEODataFn()
-      forceStoreSEOData(seoData).then(() => sendResponse({ ok: true }))
-      return true
+      debouncedStoreSEOData()
     }
   })
 }

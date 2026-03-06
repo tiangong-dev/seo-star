@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import React, { useEffect, useState } from "react"
 
-import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import "react-json-view-lite/dist/index.css"
@@ -16,8 +15,6 @@ import type { SEOData } from "~types/seoData"
 import { useSearch } from "./hooks/useSearch"
 import { useThemeMode } from "./hooks/useThemeMode"
 
-const storage = new Storage()
-
 function IndexPopup() {
   const [seoData] = useStorage<SEOData>("seoData", (data) => {
     return data ?? {}
@@ -31,15 +28,9 @@ function IndexPopup() {
 
       setTabUrl(tab.url)
 
-      chrome.tabs.sendMessage(
-        tab.id,
-        { type: "SEO_STAR_REFRESH" },
-        () => {
-          if (chrome.runtime.lastError) {
-            storage.set("seoData", {})
-          }
-        }
-      )
+      chrome.tabs.sendMessage(tab.id, { type: "SEO_STAR_REFRESH" }, () => {
+        void chrome.runtime.lastError
+      })
     })
   }, [])
 
